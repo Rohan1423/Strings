@@ -73,6 +73,55 @@ string minWindow(string s, string t) {  // T.C O(N + M) → N = length of s, M =
     return (minLen == INT_MAX) ? "" : s.substr(minLeft, minLen);
 }
 
+string minWindowASCII(string s, string t) {  // Optimized Minimum Window Substring (Using Array) T.C O(N) S.C O(1) (128 constant size array)
+    if (s.empty() || t.empty()) return "";
+
+    int freq[128] = {0};// ASCII size
+
+    // Step 1: Store frequency of t
+    for (char c : t)
+        freq[c]++;
+
+    int left = 0;
+    int count = t.length();   // total chars we need to match
+    int minLen = INT_MAX;
+    int startIndex = 0;
+
+    // Step 2: Expand window
+    for (int right = 0; right < s.length(); right++) {
+
+        // If this character is needed, reduce count
+        if (freq[s[right]] > 0)
+            count--;
+
+        // Decrease freq for current character
+        freq[s[right]]--;
+
+        // Step 3: When all chars matched
+        while (count == 0) {
+
+            // Update minimum window
+            if (right - left + 1 < minLen) {
+                minLen = right - left + 1;
+                startIndex = left;
+            }
+
+            // Try to shrink window
+            freq[s[left]]++;
+
+            // If after incrementing, it becomes > 0,
+            // that means we lost a required character
+            if (freq[s[left]] > 0)
+                count++;
+
+            left++;
+        }
+    }
+
+    return (minLen == INT_MAX) ? "" : s.substr(startIndex, minLen);
+}
+
+
 int main() {
     string s = "ADOBECODEBANC";
     string t = "ABC";
